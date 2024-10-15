@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 #include <string>
 
 #include "stat_reader.h"
@@ -15,9 +16,30 @@ void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::strin
 
     std::string_view command = request.substr(command_begin, space_pos - command_begin);
     if (command == "Bus"s) {
-        transport_catalogue.GetBusInfo(request.substr(not_space), output);
+        auto req = request.substr(not_space);
+        if (transport_catalogue.FindBus(req) == nullptr) {
+            output << "Bus "s << req << ": not found"s << std::endl;
+        } else {
+            BusInfo bus_info = transport_catalogue.GetBusInfo(req);
+            output << "Bus "s << req << ": "s << bus_info.stops_on_route << " stops on route, "s << bus_info.unique_stops << " unique stops, "s
+                   << bus_info.route_length << " route length"s << std::endl;
+        }
     } else {
-        transport_catalogue.GetStopInfo(request.substr(not_space), output);
+        auto req = request.substr(not_space);
+        if (transport_catalogue.FindStop(req) == nullptr) {
+            output << "Stop "s << req << ": not found"s << std::endl;
+        } else {
+            auto buses = transport_catalogue.GetStopInfo(req);
+            if (buses.empty()) {
+                output << "Stop "s << req << ": no buses"s << std::endl;
+            } else {
+                output << "Stop "s << req << ": buses"s;
+                for (const auto& bus_name : buses) {
+                    output << " "s << bus_name;
+                }
+                output << std::endl;
+            }
+        }
     }
 }
 

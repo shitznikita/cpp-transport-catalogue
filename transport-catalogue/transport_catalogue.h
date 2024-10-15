@@ -12,8 +12,6 @@
 
 namespace transport_catalogue {
 
-class TransportCatalogue {
-public:
     struct Stop {
         std::string name;
         Coordinates coordinates;
@@ -24,17 +22,25 @@ public:
         std::vector<Stop*> stops;
     };
 
+    struct BusInfo {
+        std::size_t stops_on_route;
+        std::size_t unique_stops;
+        double route_length;
+    };
+
+class TransportCatalogue {
+public:
     void AddStop(const Stop& stop);
 
-    Stop* FindStop(const std::string_view& stop_name);
+    Stop* FindStop(const std::string_view& stop_name) const ;
 
     void AddBus(const Bus& bus);
 
-    Bus* FindBus(const std::string_view& bus_name);
+    Bus* FindBus(const std::string_view& bus_name) const;
 
-    void GetBusInfo(const std::string_view& request, std::ostream& output) const;
+    BusInfo GetBusInfo(const std::string_view& request) const;
 
-    void GetStopInfo(const std::string_view& request, std::ostream& output) const;
+    std::set<std::string_view> GetStopInfo(const std::string_view& request) const;
 
 private:
     std::deque<Stop> stops_;

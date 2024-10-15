@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "transport_catalogue.h"
 
 using namespace std::literals;
@@ -11,9 +9,12 @@ void TransportCatalogue::AddStop(const Stop& stop) {
     stopname_to_stop_[stops_.back().name] = &stops_.back();
 }
 
-TransportCatalogue::Stop* TransportCatalogue::FindStop(const std::string_view& stop_name) {
-    assert(stopname_to_stop_.count(stop_name) == 1);
-    return stopname_to_stop_.at(stop_name);
+Stop* TransportCatalogue::FindStop(const std::string_view& stop_name) const {
+    auto stop = stopname_to_stop_.find(stop_name);
+    if (stop == stopname_to_stop_.end()) {
+        return nullptr;
+    }
+    return stop->second;
 }
 
 void TransportCatalogue::AddBus(const Bus& bus) {
@@ -24,9 +25,12 @@ void TransportCatalogue::AddBus(const Bus& bus) {
     }
 }
 
-TransportCatalogue::Bus* TransportCatalogue::FindBus(const std::string_view& bus_name) {
-    assert(busname_to_bus_.count(bus_name) == 1);
-    return busname_to_bus_.at(bus_name);
+Bus* TransportCatalogue::FindBus(const std::string_view& bus_name) const {
+    auto bus = busname_to_bus_.find(bus_name);
+    if (bus == busname_to_bus_.end()) {
+        return nullptr;
+    }
+    return bus->second;
 }
 
 std::size_t TransportCatalogue::GetStopsOnRoute(const std::string_view& request) const {
@@ -50,27 +54,15 @@ double TransportCatalogue::GetRouteLength(const std::string_view& request) const
     return res;
 }
 
-void TransportCatalogue::GetBusInfo(const std::string_view& request, std::ostream& output) const {
-    if (busname_to_bus_.count(request) == 0) {
-        output << "Bus "s << request << ": not found"s << std::endl;
-    } else {
-        output << "Bus "s << request << ": "s << GetStopsOnRoute(request) << " stops on route, "s << GetUniqueStops(request) << " unique stops, "s
-               << GetRouteLength(request) << " route length"s << std::endl;
-    }
+BusInfo TransportCatalogue::GetBusInfo(const std::string_view& request) const {
+    return BusInfo({GetStopsOnRoute(request), GetUniqueStops(request), GetRouteLength(request)});
 }
 
-void TransportCatalogue::GetStopInfo(const std::string_view& request, std::ostream& output) const {
-    if (stopname_to_stop_.count(request) == 0) {
-        output << "Stop "s << request << ": not found"s << std::endl;
-    } else if (stopname_to_busname_.count(request) == 0) {
-        output << "Stop "s << request << ": no buses"s << std::endl;
-    } else {
-        output << "Stop "s << request << ": buses"s;
-        for (const auto& bus_name : stopname_to_busname_.at(request)) {
-            output << " "s << bus_name;
-        }
-        output << std::endl;
+std::set<std::string_view> TransportCatalogue::GetStopInfo(const std::string_view& request) const {
+    if (stopname_to_busname_.count(request) == 0) {
+        return std::set<std::string_view>();
     }
+    return stopname_to_busname_.at(request);
 }
 
 } // namespace transport_catalogue
