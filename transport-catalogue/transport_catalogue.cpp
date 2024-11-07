@@ -1,5 +1,7 @@
 #include "transport_catalogue.h"
 
+#include <utility>
+
 using namespace std::literals;
 
 namespace transport_catalogue {
@@ -15,6 +17,19 @@ Stop* TransportCatalogue::FindStop(const std::string_view& stop_name) const {
         return nullptr;
     }
     return stop->second;
+}
+
+void TransportCatalogue::AddDistanceBetweenStops(Stop* stop1, Stop* stop2, int distance) {
+    distance_between_stops_[{stop1, stop2}] = distance;
+}
+
+int TransportCatalogue::GetDistanceBetweenStops(Stop* stop1, Stop* stop2) const {
+    auto distance = distance_between_stops_.find({stop1, stop2});
+    if (distance != distance_between_stops_.end()) {
+        return distance->second;
+    }
+    distance = distance_between_stops_.find({stop2, stop1});
+    return distance->second;
 }
 
 void TransportCatalogue::AddBus(const Bus& bus) {
@@ -45,7 +60,16 @@ std::size_t TransportCatalogue::GetUniqueStops(const std::string_view& request) 
     return unique_stops.size();
 }
 
-double TransportCatalogue::GetRouteLength(const std::string_view& request) const {
+int TransportCatalogue::GetRouteLength(const std::string_view& request) const {
+    int res = 0;
+    auto& bus = busname_to_bus_.at(request);
+    for (std::size_t i = 1; i < bus->stops.size(); ++i) {
+        res += GetDistanceBetweenStops(bus->stops[i-1], bus->stops[i]);
+    }
+    return res;
+}
+
+double TransportCatalogue::GetCurvature(const std::string_view& request) const {
     double res = 0.0;
     auto& bus = busname_to_bus_.at(request);
     for (std::size_t i = 1; i < bus->stops.size(); ++i) {
@@ -55,7 +79,7 @@ double TransportCatalogue::GetRouteLength(const std::string_view& request) const
 }
 
 BusInfo TransportCatalogue::GetBusInfo(const std::string_view& request) const {
-    return BusInfo({GetStopsOnRoute(request), GetUniqueStops(request), GetRouteLength(request)});
+    return BusInfo({GetStopsOnRoute(request), GetUniqueStops(request), GetRouteLength(request), GetRouteLength(request) / GetCurvature(request)});
 }
 
 std::set<std::string_view> TransportCatalogue::GetStopInfo(const std::string_view& request) const {
