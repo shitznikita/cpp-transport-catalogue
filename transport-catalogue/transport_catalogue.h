@@ -19,7 +19,7 @@ namespace transport_catalogue {
 
     struct Bus {
         std::string name;
-        std::vector<Stop*> stops;
+        std::vector<const Stop*> stops;
     };
 
     struct BusInfo {
@@ -49,37 +49,38 @@ class TransportCatalogue {
 public:
     void AddStop(const Stop& stop);
 
-    Stop* FindStop(const std::string_view& stop_name) const;
+    const Stop* FindStop(std::string_view stop_name) const;
 
-    void AddDistanceBetweenStops(Stop* stop1, Stop* stop2, int distance);
+    void AddDistanceBetweenStops(const Stop* from, const Stop* to, int distance);
 
-    int GetDistanceBetweenStops(Stop* stop1, Stop* stop2) const;
+    int GetDistanceBetweenStops(const Stop* from, const Stop* to) const;
 
     void AddBus(const Bus& bus);
 
-    Bus* FindBus(const std::string_view& bus_name) const;
+    const Bus* FindBus(std::string_view bus_name) const;
 
-    BusInfo GetBusInfo(const std::string_view& request) const;
+    BusInfo GetBusInfo(std::string_view request) const;
 
-    std::set<std::string_view> GetStopInfo(const std::string_view& request) const;
+    const std::set<std::string_view>& GetStopInfo(std::string_view request) const;
 
 private:
     std::deque<Stop> stops_;
     std::unordered_map<std::string_view, Stop*> stopname_to_stop_;
-    std::unordered_map<std::pair<Stop*, Stop*>, int, PairHasher, PairEqual> distance_between_stops_;
+    std::unordered_map<std::pair<const Stop*, const Stop*>, int, PairHasher, PairEqual> distance_between_stops_;
 
     std::deque<Bus> buses_;
     std::unordered_map<std::string_view, Bus*> busname_to_bus_;
 
     std::unordered_map<std::string_view, std::set<std::string_view>> stopname_to_busname_;
+    std::set<std::string_view> empty_set_ = {};
 
-    std::size_t GetStopsOnRoute(const std::string_view& request) const;
+    std::size_t GetStopsOnRoute(std::string_view request) const;
 
-    std::size_t GetUniqueStops(const std::string_view& request) const;
+    std::size_t GetUniqueStops(std::string_view request) const;
 
-    int GetRouteLength(const std::string_view& request) const;
+    int GetRouteLength(std::string_view request) const;
 
-    double GetCurvature(const std::string_view& request) const;
+    double GetCurvature(std::string_view request) const;
 };
 
 } // namespace transport_catalogue

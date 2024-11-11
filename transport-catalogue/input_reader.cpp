@@ -125,7 +125,7 @@ void InputReader::ParseLine(std::string_view line) {
     }
 }
 
-CommandType GetCommandType(const std::string_view& command) {
+CommandType GetCommandType(std::string_view command) {
     if (command == "Stop"s) {
         return CommandType::STOP;
     } else if (command == "Bus"s) {
@@ -160,7 +160,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) 
     }
 
     for (const auto& command : only_bus_commands) {
-        std::vector<Stop*> stops;
+        std::vector<const Stop*> stops;
         for (const auto& stop : detail::ParseRoute(command.description)) {
             stops.push_back(catalogue.FindStop(stop));
         }
