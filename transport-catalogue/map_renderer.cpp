@@ -59,46 +59,46 @@ namespace {
             std::vector<svg::Text> route_names;
 
             route_names.push_back(svg::Text().SetData(bus_.name)
-                                            .SetPosition(GetProj()(bus_.stops[0]->coordinates))
-                                            .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
-                                            .SetFontSize(GetSettings().bus_label_font_size)
-                                            .SetFontFamily("Verdana")
-                                            .SetFontWeight("bold")
-                                            .SetStrokeColor(GetSettings().underlayer_color)
-                                            .SetFillColor(GetSettings().underlayer_color)
-                                            .SetStrokeWidth(GetSettings().underlayer_width)
-                                            .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
-                                            .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND));
+                                .SetPosition(GetProj()(bus_.stops[0]->coordinates))
+                                .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
+                                .SetFontSize(GetSettings().bus_label_font_size)
+                                .SetFontFamily("Verdana")
+                                .SetFontWeight("bold")
+                                .SetStrokeColor(GetSettings().underlayer_color)
+                                .SetFillColor(GetSettings().underlayer_color)
+                                .SetStrokeWidth(GetSettings().underlayer_width)
+                                .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
+                                .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND));
 
             route_names.push_back(svg::Text().SetData(bus_.name)
-                                            .SetPosition(GetProj()(bus_.stops[0]->coordinates))
-                                            .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
-                                            .SetFontSize(GetSettings().bus_label_font_size)
-                                            .SetFontFamily("Verdana")
-                                            .SetFontWeight("bold")
-                                            .SetFillColor(GetSettings().color_palette[color_]));
+                                .SetPosition(GetProj()(bus_.stops[0]->coordinates))
+                                .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
+                                .SetFontSize(GetSettings().bus_label_font_size)
+                                .SetFontFamily("Verdana")
+                                .SetFontWeight("bold")
+                                .SetFillColor(GetSettings().color_palette[color_]));
             if (!bus_.is_roundtrip) {
                 std::size_t stop_it = bus_.stops.size() / 2;
                 if (bus_.stops[0]->name != bus_.stops[stop_it]->name) {
                     route_names.push_back(svg::Text().SetData(bus_.name)
-                                            .SetPosition(GetProj()(bus_.stops[stop_it]->coordinates))
-                                            .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
-                                            .SetFontSize(GetSettings().bus_label_font_size)
-                                            .SetFontFamily("Verdana")
-                                            .SetFontWeight("bold")
-                                            .SetStrokeColor(GetSettings().underlayer_color)
-                                            .SetFillColor(GetSettings().underlayer_color)
-                                            .SetStrokeWidth(GetSettings().underlayer_width)
-                                            .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
-                                            .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND));
+                                        .SetPosition(GetProj()(bus_.stops[stop_it]->coordinates))
+                                        .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
+                                        .SetFontSize(GetSettings().bus_label_font_size)
+                                        .SetFontFamily("Verdana")
+                                        .SetFontWeight("bold")
+                                        .SetStrokeColor(GetSettings().underlayer_color)
+                                        .SetFillColor(GetSettings().underlayer_color)
+                                        .SetStrokeWidth(GetSettings().underlayer_width)
+                                        .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
+                                        .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND));
 
                     route_names.push_back(svg::Text().SetData(bus_.name)
-                                                    .SetPosition(GetProj()(bus_.stops[stop_it]->coordinates))
-                                                    .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
-                                                    .SetFontSize(GetSettings().bus_label_font_size)
-                                                    .SetFontFamily("Verdana")
-                                                    .SetFontWeight("bold")
-                                                    .SetFillColor(GetSettings().color_palette[color_]));
+                                        .SetPosition(GetProj()(bus_.stops[stop_it]->coordinates))
+                                        .SetOffset({GetSettings().bus_label_offset[0], GetSettings().bus_label_offset[1]})
+                                        .SetFontSize(GetSettings().bus_label_font_size)
+                                        .SetFontFamily("Verdana")
+                                        .SetFontWeight("bold")
+                                        .SetFillColor(GetSettings().color_palette[color_]));
                 }
             }
 
@@ -144,22 +144,22 @@ namespace {
 
             for (const auto& stop : stops_) {
                 stop_names.push_back(svg::Text().SetData(stop.name)
-                                                .SetPosition(GetProj()(stop.coordinates))
-                                                .SetOffset({GetSettings().stop_label_offset[0], GetSettings().stop_label_offset[1]})
-                                                .SetFontSize(GetSettings().stop_label_font_size)
-                                                .SetFontFamily("Verdana")
-                                                .SetStrokeColor(GetSettings().underlayer_color)
-                                                .SetFillColor(GetSettings().underlayer_color)
-                                                .SetStrokeWidth(GetSettings().underlayer_width)
-                                                .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
-                                                .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND));
+                                    .SetPosition(GetProj()(stop.coordinates))
+                                    .SetOffset({GetSettings().stop_label_offset[0], GetSettings().stop_label_offset[1]})
+                                    .SetFontSize(GetSettings().stop_label_font_size)
+                                    .SetFontFamily("Verdana")
+                                    .SetStrokeColor(GetSettings().underlayer_color)
+                                    .SetFillColor(GetSettings().underlayer_color)
+                                    .SetStrokeWidth(GetSettings().underlayer_width)
+                                    .SetStrokeLineCap(svg::StrokeLineCap::ROUND)
+                                    .SetStrokeLineJoin(svg::StrokeLineJoin::ROUND));
 
                 stop_names.push_back(svg::Text().SetData(stop.name)
-                                                .SetPosition(GetProj()(stop.coordinates))
-                                                .SetOffset({GetSettings().stop_label_offset[0], GetSettings().stop_label_offset[1]})
-                                                .SetFontSize(GetSettings().stop_label_font_size)
-                                                .SetFontFamily("Verdana")
-                                                .SetFillColor("black"));
+                                    .SetPosition(GetProj()(stop.coordinates))
+                                    .SetOffset({GetSettings().stop_label_offset[0], GetSettings().stop_label_offset[1]})
+                                    .SetFontSize(GetSettings().stop_label_font_size)
+                                    .SetFontFamily("Verdana")
+                                    .SetFillColor("black"));
             }
 
             for (const auto& stop : stop_names) {

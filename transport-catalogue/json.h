@@ -17,14 +17,11 @@ namespace json {
         using runtime_error::runtime_error;
     };
 
-    class Node final {
+    class Node : public std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> {
     public:
         using Value = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
+        using Value::Value;
 
-        Node() = default;
-        Node(std::nullptr_t)
-            : value_(nullptr) {
-        }
         Node(int val)
             : value_(val) {
         }

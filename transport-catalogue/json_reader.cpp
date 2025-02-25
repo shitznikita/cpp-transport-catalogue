@@ -39,22 +39,22 @@ namespace {
     JsonReader::JsonReader (std::istream& input) :
         doc_(json::Load(input))
     {
-        const auto& root = doc_.GetRoot();
-        for (const auto& dict : root.AsMap()) {
-            if (dict.first == "base_requests") {
-                request_commands_ = &dict.second.AsArray();
-            } else if (dict.first == "stat_requests") {
-                stat_commands_ = &dict.second.AsArray();
-            } else if (dict.first == "render_settings") {
-                render_settings_ = &dict.second.AsMap();
-            }
-        }
+        const auto& root = doc_.GetRoot().AsMap();
+        request_commands_ = &root.at("base_requests").AsArray();
+        stat_commands_ = &root.at("stat_requests").AsArray();
+        render_settings_ = &root.at("render_settings").AsMap();
     }
 
     void JsonReader::ApplyCommands(TransportCatalogue& catalogue) const {
         json::Array only_stop_commands;
         json::Array only_bus_commands;
 
+        CommandDistribution(only_stop_commands, only_bus_commands, catalogue);
+        StopsHandle(only_stop_commands, catalogue);
+        BusesHandle(only_bus_commands, catalogue);
+    }
+
+    void JsonReader::CommandDistribution(json::Array& only_stop_commands, json::Array& only_bus_commands, TransportCatalogue& catalogue) const {
         for (const auto& command : *request_commands_) {
             const auto& description = command.AsMap();
             const auto& type = description.at("type").AsString();
@@ -67,20 +67,24 @@ namespace {
                 only_bus_commands.push_back(std::move(command));
             }
         }
+    }
 
+    void JsonReader::StopsHandle(json::Array& only_stop_commands, TransportCatalogue& catalogue) const {
         for (const auto& command : only_stop_commands) {
             const auto& description = command.AsMap();
             const auto& name = description.at("name").AsString();
             const auto& road_distances = description.at("road_distances").AsMap();
             if (!road_distances.empty()) {
                 for (const auto& distance : road_distances) {
-                    catalogue.AddDistanceBetweenStops(
+                    catalogue.SetDistanceBetweenStops(
                         catalogue.FindStop(name), catalogue.FindStop(distance.first), distance.second.AsInt()
                     );
                 }
             }
         }
+    }
 
+    void JsonReader::BusesHandle(json::Array& only_bus_commands, TransportCatalogue& catalogue) const {
         for (const auto& command : only_bus_commands) {
             const auto& description = command.AsMap();
             const auto& route = description.at("stops").AsArray();
@@ -152,37 +156,11 @@ namespace {
             const auto& description = command.AsMap();
             const auto& type = description.at("type").AsString();
             if (type == "Bus") {
-                json::Dict bus;
                 const auto& bus_info = request_handler.GetBusStat(description.at("name").AsString());
-                bus.insert({"request_id", description.at("id").AsInt()});
-                if (bus_info.has_value()) {
-                    bus.insert({"curvature", bus_info->curvature});
-                    bus.insert({"route_length", bus_info->route_length});
-                    bus.insert({"stop_count", static_cast<int>(bus_info->stops_on_route)});
-                    bus.insert({"unique_stop_count", static_cast<int>(bus_info->unique_stops)});
-                } else {
-                    bus.insert({"error_message", std::string("not found")});
-                }
-                res.push_back(bus);
+                PrintBusInfo(res, bus_info, description.at("id").AsInt());
             } else if (type == "Stop") {
-                json::Dict stop;
                 const auto& stop_info = request_handler.GetBusesByStop(description.at("name").AsString());
-                stop.insert({"request_id", description.at("id").AsInt()});
-                if (stop_info.has_value()) {
-                    if (!stop_info->empty()) {
-                        json::Array buses;
-                        for (const auto& bus_name : *stop_info) {
-                            buses.push_back(std::string(bus_name));
-                        }
-                        stop.insert({"buses", buses});
-                    } else {
-                        json::Array buses;
-                        stop.insert({"buses", buses});
-                    }
-                } else {
-                    stop.insert({"error_message", std::string("not found")});
-                }
-                res.push_back(stop);
+                PrintStopInfo(res, stop_info, description.at("id").AsInt());
             } else if (type == "Map") {
                 json::Dict map;
                 std::ostringstream map_out;
@@ -194,6 +172,40 @@ namespace {
         }
         json::Document doc(res);
         json::Print(doc, out);
+    }
+
+    void JsonReader::PrintBusInfo(json::Array& res, const std::optional<BusInfo>& bus_info, int id) const {
+        json::Dict bus;
+        bus.insert({"request_id", id});
+        if (bus_info.has_value()) {
+            bus.insert({"curvature", bus_info->curvature});
+            bus.insert({"route_length", bus_info->route_length});
+            bus.insert({"stop_count", static_cast<int>(bus_info->stops_on_route)});
+            bus.insert({"unique_stop_count", static_cast<int>(bus_info->unique_stops)});
+        } else {
+            bus.insert({"error_message", std::string("not found")});
+        }
+        res.push_back(bus);
+    }
+
+    void JsonReader::PrintStopInfo(json::Array& res, const std::optional<std::set<std::string_view>>& stop_info, int id) const {
+        json::Dict stop;
+        stop.insert({"request_id", id});
+        if (stop_info.has_value()) {
+            if (!stop_info->empty()) {
+                json::Array buses;
+                for (const auto& bus_name : *stop_info) {
+                    buses.push_back(std::string(bus_name));
+                }
+                stop.insert({"buses", buses});
+            } else {
+                json::Array buses;
+                stop.insert({"buses", buses});
+            }
+        } else {
+            stop.insert({"error_message", std::string("not found")});
+        }
+        res.push_back(stop);
     }
 
 }  // namespace json_reader

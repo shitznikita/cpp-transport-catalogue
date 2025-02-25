@@ -23,6 +23,13 @@ namespace json_reader {
         const json::Array* request_commands_;
         const json::Array* stat_commands_;
         const json::Dict* render_settings_;
+
+        void CommandDistribution(json::Array& only_stop_commands, json::Array& only_bus_commands, TransportCatalogue& catalogue) const;
+        void StopsHandle(json::Array& only_stop_commands, TransportCatalogue& catalogue) const;
+        void BusesHandle(json::Array& only_bus_commands, TransportCatalogue& catalogue) const;
+
+        void PrintBusInfo(json::Array& res, const std::optional<BusInfo>& bus_info, int id) const;
+        void PrintStopInfo(json::Array& res, const std::optional<std::set<std::string_view>>& stop_info, int id) const;
     };
 
 }  // namespace json_reader
