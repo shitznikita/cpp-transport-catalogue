@@ -7,11 +7,19 @@ namespace transport_catalogue {
     using namespace domain;
 
     const std::optional<BusInfo> RequestHandler::GetBusStat(const std::string_view& bus_name) const {
-        return db_.GetBusInfo(bus_name);
+        auto bus = db_.FindBus(bus_name);
+        if (bus != nullptr) {
+            return db_.GetBusInfo(bus->name);
+        }
+        return std::nullopt;
     }
 
-    const std::optional<std::set<std::string_view>> RequestHandler::GetBusesByStop(const std::string_view& stop_name) const {
-        return db_.GetStopInfo(stop_name);
+    const std::optional<std::unordered_set<std::string_view>> RequestHandler::GetBusesByStop(const std::string_view& stop_name) const {
+        auto stop = db_.FindStop(stop_name);
+        if (stop != nullptr) {
+            return db_.GetStopInfo(stop->name);
+        }
+        return std::nullopt;
     }
 
     svg::Document RequestHandler::RenderMap() const {

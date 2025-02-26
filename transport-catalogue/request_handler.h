@@ -14,7 +14,7 @@ namespace transport_catalogue {
 
         const std::optional<BusInfo> GetBusStat(const std::string_view& bus_name) const;
 
-        const std::optional<std::set<std::string_view>> GetBusesByStop(const std::string_view& stop_name) const;
+        const std::optional<std::unordered_set<std::string_view>> GetBusesByStop(const std::string_view& stop_name) const;
 
         svg::Document RenderMap() const;
 

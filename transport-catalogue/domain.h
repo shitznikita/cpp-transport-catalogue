@@ -20,7 +20,7 @@ namespace domain {
 
     struct Bus {
         std::string name;
-        std::vector<Stop*> stops;
+        std::vector<const Stop*> stops;
         bool is_roundtrip;
     };
 

@@ -88,17 +88,15 @@ namespace {
         for (const auto& command : only_bus_commands) {
             const auto& description = command.AsMap();
             const auto& route = description.at("stops").AsArray();
-            std::vector<Stop*> stops;
+            std::vector<const Stop*> stops;
             for (const auto& stop : route) {
                 stops.push_back(catalogue.FindStop(stop.AsString()));
             }
             bool is_roundtrip = description.at("is_roundtrip").AsBool();
-            if (!is_roundtrip) {
-                if (route.size() > 1) {
-                    for (auto it = route.rbegin() + 1; it != route.rend(); ++it) {
-                        const auto& stop = *it;
-                        stops.push_back(catalogue.FindStop(stop.AsString()));
-                    }
+            if (!is_roundtrip && route.size() > 1) {
+                for (auto it = route.rbegin() + 1; it != route.rend(); ++it) {
+                    const auto& stop = *it;
+                    stops.push_back(catalogue.FindStop(stop.AsString()));
                 }
             }
             catalogue.AddBus({description.at("name").AsString(),
@@ -179,7 +177,7 @@ namespace {
         bus.insert({"request_id", id});
         if (bus_info.has_value()) {
             bus.insert({"curvature", bus_info->curvature});
-            bus.insert({"route_length", bus_info->route_length});
+            bus.insert({"route_length", double(bus_info->route_length)});
             bus.insert({"stop_count", static_cast<int>(bus_info->stops_on_route)});
             bus.insert({"unique_stop_count", static_cast<int>(bus_info->unique_stops)});
         } else {
@@ -188,13 +186,14 @@ namespace {
         res.push_back(bus);
     }
 
-    void JsonReader::PrintStopInfo(json::Array& res, const std::optional<std::set<std::string_view>>& stop_info, int id) const {
+    void JsonReader::PrintStopInfo(json::Array& res, const std::optional<std::unordered_set<std::string_view>>& stop_info, int id) const {
         json::Dict stop;
         stop.insert({"request_id", id});
         if (stop_info.has_value()) {
             if (!stop_info->empty()) {
                 json::Array buses;
-                for (const auto& bus_name : *stop_info) {
+                std::set<std::string_view> sorted_stop_info((*stop_info).begin(), (*stop_info).end());
+                for (const auto& bus_name : sorted_stop_info) {
                     buses.push_back(std::string(bus_name));
                 }
                 stop.insert({"buses", buses});

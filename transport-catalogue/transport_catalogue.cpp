@@ -13,7 +13,7 @@ namespace transport_catalogue {
         stopname_to_stop_.insert({stops_.back().name, &stops_.back()});
     }
 
-    Stop* TransportCatalogue::FindStop(const std::string_view stop_name) const {
+    const Stop* TransportCatalogue::FindStop(const std::string_view stop_name) const {
         auto stop = stopname_to_stop_.find(stop_name);
         if (stop == stopname_to_stop_.end()) {
             return nullptr;
@@ -21,11 +21,11 @@ namespace transport_catalogue {
         return stop->second;
     }
 
-    void TransportCatalogue::SetDistanceBetweenStops(Stop* const stop1, Stop* const stop2, int distance) {
+    void TransportCatalogue::SetDistanceBetweenStops(const Stop* stop1, const Stop* stop2, int distance) {
         distance_between_stops_[{stop1, stop2}] = distance;
     }
 
-    int TransportCatalogue::GetDistanceBetweenStops(Stop* const stop1, Stop* const stop2) const {
+    int TransportCatalogue::GetDistanceBetweenStops(const Stop* stop1, const Stop* stop2) const {
         auto distance = distance_between_stops_.find({stop1, stop2});
         if (distance != distance_between_stops_.end()) {
             return distance->second;
@@ -42,7 +42,7 @@ namespace transport_catalogue {
         }
     }
 
-    Bus* TransportCatalogue::FindBus(const std::string_view bus_name) const {
+    const Bus* TransportCatalogue::FindBus(const std::string_view bus_name) const {
         auto bus = busname_to_bus_.find(bus_name);
         if (bus == busname_to_bus_.end()) {
             return nullptr;
@@ -50,7 +50,7 @@ namespace transport_catalogue {
         return bus->second;
     }
 
-    std::size_t TransportCatalogue::GetStopsOnRoute(const std::string_view& request) const {
+    std::size_t TransportCatalogue::GetStopsOnRoute(const std::string_view request) const {
         auto bus = busname_to_bus_.find(request);
         if (bus == busname_to_bus_.end()) {
             assert("No stops on route");
@@ -58,8 +58,8 @@ namespace transport_catalogue {
         return bus->second->stops.size();
     }
 
-    std::size_t TransportCatalogue::GetUniqueStops(const std::string_view& request) const {
-        std::unordered_set<Stop*> unique_stops;
+    std::size_t TransportCatalogue::GetUniqueStops(const std::string_view request) const {
+        std::unordered_set<const Stop*> unique_stops;
         auto bus = busname_to_bus_.find(request);
         if (bus == busname_to_bus_.end()) {
             assert("No unique stops");
@@ -70,7 +70,7 @@ namespace transport_catalogue {
         return unique_stops.size();
     }
 
-    int TransportCatalogue::GetRouteLength(const std::string_view& request) const {
+    int TransportCatalogue::GetRouteLength(const std::string_view request) const {
         int res = 0;
         auto& bus = busname_to_bus_.at(request);
         for (std::size_t i = 1; i < bus->stops.size(); ++i) {
@@ -79,7 +79,7 @@ namespace transport_catalogue {
         return res;
     }
 
-    double TransportCatalogue::GetCurvature(const std::string_view& request) const {
+    double TransportCatalogue::GetCurvature(const std::string_view request) const {
         double res = 0.0;
         auto& bus = busname_to_bus_.at(request);
         for (std::size_t i = 1; i < bus->stops.size(); ++i) {
@@ -92,24 +92,17 @@ namespace transport_catalogue {
         return buses_;
     }
 
-    std::optional<BusInfo> TransportCatalogue::GetBusInfo(const std::string_view request) const {
-        if (FindBus(request) == nullptr) {
-            return std::nullopt;
-        }
+    BusInfo TransportCatalogue::GetBusInfo(const std::string_view request) const {
         return BusInfo({GetStopsOnRoute(request), GetUniqueStops(request), GetRouteLength(request), GetRouteLength(request) / GetCurvature(request)});
     }
 
-    std::optional<std::set<std::string_view>> TransportCatalogue::GetStopInfo(const std::string_view request) const {
-        if (FindStop(request) == nullptr) {
-            return std::nullopt;
-        }
+    const std::unordered_set<std::string_view>& TransportCatalogue::GetStopInfo(const std::string_view request) const {
         auto stop = stopname_to_busname_.find(request);
         if (stop == stopname_to_busname_.end()) {
-            static std::set<std::string_view> empty_stop;
+            static std::unordered_set<std::string_view> empty_stop; 
             return empty_stop;
         }
-        std::set<std::string_view> sorted_set(stop->second.begin(), stop->second.end());
-        return sorted_set;
+        return stop->second;
     }
 
 } // namespace transport_catalogue

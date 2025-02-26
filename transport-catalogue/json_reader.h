@@ -29,7 +29,7 @@ namespace json_reader {
         void BusesHandle(json::Array& only_bus_commands, TransportCatalogue& catalogue) const;
 
         void PrintBusInfo(json::Array& res, const std::optional<BusInfo>& bus_info, int id) const;
-        void PrintStopInfo(json::Array& res, const std::optional<std::set<std::string_view>>& stop_info, int id) const;
+        void PrintStopInfo(json::Array& res, const std::optional<std::unordered_set<std::string_view>>& stop_info, int id) const;
     };
 
 }  // namespace json_reader
