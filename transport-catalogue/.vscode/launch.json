@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/shnapinut/Documents/shitz_projects/github_projects/cpp-transport-catalogue/transport-catalogue",
-      "program": "c:/Users/shnapinut/Documents/shitz_projects/github_projects/cpp-transport-catalogue/transport-catalogue/build/Debug/outDebug",
+      "cwd": "C:/Users/shnapinut/Documents/shitz-projects/github-projects/praktikum-projects/cpp-transport-catalogue/transport-catalogue",
+      "program": "C:/Users/shnapinut/Documents/shitz-projects/github-projects/praktikum-projects/cpp-transport-catalogue/transport-catalogue/build/Debug/outDebug.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

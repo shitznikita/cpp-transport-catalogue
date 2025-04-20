@@ -92,6 +92,10 @@ namespace transport_catalogue {
         return buses_;
     }
 
+    const std::deque<Stop>& TransportCatalogue::GetStops() const {
+        return stops_;
+    }
+
     BusInfo TransportCatalogue::GetBusInfo(const std::string_view request) const {
         return BusInfo({GetStopsOnRoute(request), GetUniqueStops(request), GetRouteLength(request), GetRouteLength(request) / GetCurvature(request)});
     }

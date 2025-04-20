@@ -32,4 +32,11 @@ namespace transport_catalogue {
         return renderer_.Render(buses);
     }
 
+    std::optional<transport_router::RouteItems> RequestHandler::GetRouteInfo(
+        const std::string_view from, 
+        const std::string_view to
+    ) const {
+        return router_.GetRouteInfo(from, to);
+    }
+
 }  // namespace transport_catalogue
